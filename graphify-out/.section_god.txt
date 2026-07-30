@@ -1,0 +1,12 @@
+## God Nodes (most connected - your core abstractions)
+1. `api` - 9 edges
+2. `Footer()` - 8 edges
+3. `Navbar()` - 8 edges
+4. `asyncHandler()` - 7 edges
+5. `Order` - 7 edges
+6. `scripts` - 7 edges
+7. `protect` - 6 edges
+8. `Product` - 6 edges
+9. `User` - 6 edges
+10. `connectDB()` - 5 edges
+

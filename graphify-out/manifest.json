@@ -1,0 +1,577 @@
+{
+  "ecommerce-backend/config/db.js": {
+    "mtime": 1784874737.088273,
+    "ast_hash": "df3f0e051d1ca6d3cb613418b3718ac2",
+    "semantic_hash": "df3f0e051d1ca6d3cb613418b3718ac2"
+  },
+  "ecommerce-backend/config/swagger.js": {
+    "mtime": 1784874737.0883148,
+    "ast_hash": "a8e137e9125716e3aa331fe5838616e1",
+    "semantic_hash": "a8e137e9125716e3aa331fe5838616e1"
+  },
+  "ecommerce-backend/controller/cartController.js": {
+    "mtime": 1784874737.0883148,
+    "ast_hash": "8cc8bf117b37446dfd74e629c2ad6a47",
+    "semantic_hash": "8cc8bf117b37446dfd74e629c2ad6a47"
+  },
+  "ecommerce-backend/controller/orderController.js": {
+    "mtime": 1784874737.0884137,
+    "ast_hash": "77b40c2574468f0e3e7bc75a32b8bfb8",
+    "semantic_hash": "77b40c2574468f0e3e7bc75a32b8bfb8"
+  },
+  "ecommerce-backend/controller/paymentController.js": {
+    "mtime": 1784874737.0884137,
+    "ast_hash": "b1e0fd0d7e1b2363dbb857d96fbec3c9",
+    "semantic_hash": "b1e0fd0d7e1b2363dbb857d96fbec3c9"
+  },
+  "ecommerce-backend/controller/productController.js": {
+    "mtime": 1784874737.0884137,
+    "ast_hash": "9c9fe4926ea268ff48233e922c0ea209",
+    "semantic_hash": "9c9fe4926ea268ff48233e922c0ea209"
+  },
+  "ecommerce-backend/controller/userController.js": {
+    "mtime": 1784874737.0884137,
+    "ast_hash": "455c81fa50a0311887a09b6fc031ed00",
+    "semantic_hash": "455c81fa50a0311887a09b6fc031ed00"
+  },
+  "ecommerce-backend/data/products.js": {
+    "mtime": 1784874737.0884137,
+    "ast_hash": "8d341d1d03b6afd71f9c82e6e2244ecd",
+    "semantic_hash": "8d341d1d03b6afd71f9c82e6e2244ecd"
+  },
+  "ecommerce-backend/data/users.js": {
+    "mtime": 1784874737.0888283,
+    "ast_hash": "3c6fed16e6925bfd46c138192aa9c4fb",
+    "semantic_hash": "3c6fed16e6925bfd46c138192aa9c4fb"
+  },
+  "ecommerce-backend/middleware/asyncHandler.js": {
+    "mtime": 1784874737.242836,
+    "ast_hash": "ee4cea9924d7a8f73d1db6cd6e99392b",
+    "semantic_hash": "ee4cea9924d7a8f73d1db6cd6e99392b"
+  },
+  "ecommerce-backend/middleware/authMiddleware.js": {
+    "mtime": 1784874737.2437406,
+    "ast_hash": "74151c1f6b691b373bbfe9f49c6c656c",
+    "semantic_hash": "74151c1f6b691b373bbfe9f49c6c656c"
+  },
+  "ecommerce-backend/middleware/errorMiddleware.js": {
+    "mtime": 1784874737.2437406,
+    "ast_hash": "152754c56920a42089e04186768f8810",
+    "semantic_hash": "152754c56920a42089e04186768f8810"
+  },
+  "ecommerce-backend/models/cartModel.js": {
+    "mtime": 1784874737.2437406,
+    "ast_hash": "170ddb75c4a6cc03411006f337667a66",
+    "semantic_hash": "170ddb75c4a6cc03411006f337667a66"
+  },
+  "ecommerce-backend/models/orderModel.js": {
+    "mtime": 1784874737.2437994,
+    "ast_hash": "4012d06b408eeee550e7f4a26ab702a9",
+    "semantic_hash": "4012d06b408eeee550e7f4a26ab702a9"
+  },
+  "ecommerce-backend/models/productModels.js": {
+    "mtime": 1784874737.2437994,
+    "ast_hash": "d40fc97e6a50c0a1658185565b318a66",
+    "semantic_hash": "d40fc97e6a50c0a1658185565b318a66"
+  },
+  "ecommerce-backend/models/userModel.js": {
+    "mtime": 1784874737.2437994,
+    "ast_hash": "0bc6172fca2b83946628b1e562f96d1b",
+    "semantic_hash": "0bc6172fca2b83946628b1e562f96d1b"
+  },
+  "ecommerce-backend/routes/cartRoutes.js": {
+    "mtime": 1784874737.2437994,
+    "ast_hash": "4b9bcffd0844cf7b1c9f194c22541379",
+    "semantic_hash": "4b9bcffd0844cf7b1c9f194c22541379"
+  },
+  "ecommerce-backend/routes/orderRoutes.js": {
+    "mtime": 1784874737.2438745,
+    "ast_hash": "da68e62a7ef5397a5b67d08263b47b54",
+    "semantic_hash": "da68e62a7ef5397a5b67d08263b47b54"
+  },
+  "ecommerce-backend/routes/paymentRoutes.js": {
+    "mtime": 1784874737.2438745,
+    "ast_hash": "05d7f0dbc869d33902cba59baf815dee",
+    "semantic_hash": "05d7f0dbc869d33902cba59baf815dee"
+  },
+  "ecommerce-backend/routes/productRoutes.js": {
+    "mtime": 1784874737.2438745,
+    "ast_hash": "4e6891d3a1056fceb4aa79accdc63928",
+    "semantic_hash": "4e6891d3a1056fceb4aa79accdc63928"
+  },
+  "ecommerce-backend/routes/userRoutes.js": {
+    "mtime": 1784874737.2438745,
+    "ast_hash": "c5ef759be4459efb95ddc39b7dbdf3cd",
+    "semantic_hash": "c5ef759be4459efb95ddc39b7dbdf3cd"
+  },
+  "ecommerce-backend/seeder.js": {
+    "mtime": 1784874737.2438745,
+    "ast_hash": "ecde6dd41499e328e3c48ce00ac9f03d",
+    "semantic_hash": "ecde6dd41499e328e3c48ce00ac9f03d"
+  },
+  "ecommerce-backend/server.js": {
+    "mtime": 1784874737.2438745,
+    "ast_hash": "e691f8a0f0f1cb9d2a6c8fdcfdadc7b0",
+    "semantic_hash": "e691f8a0f0f1cb9d2a6c8fdcfdadc7b0"
+  },
+  "ecommerce-backend/swagger/cart.js": {
+    "mtime": 1784874737.2438745,
+    "ast_hash": "fdc71a21a6601358b82cfbb10f5dc5f1",
+    "semantic_hash": "fdc71a21a6601358b82cfbb10f5dc5f1"
+  },
+  "ecommerce-backend/swagger/orders.js": {
+    "mtime": 1784874737.2440002,
+    "ast_hash": "257ba2a4995387724bb33b5c225f6b1f",
+    "semantic_hash": "257ba2a4995387724bb33b5c225f6b1f"
+  },
+  "ecommerce-backend/swagger/products.js": {
+    "mtime": 1784874737.2440002,
+    "ast_hash": "f9eda5b43f311bb2c04379de6dc273a4",
+    "semantic_hash": "f9eda5b43f311bb2c04379de6dc273a4"
+  },
+  "ecommerce-backend/swagger/schemas.js": {
+    "mtime": 1784874737.2440002,
+    "ast_hash": "bb4ec46a4efdcce49aa7884550bc1f87",
+    "semantic_hash": "bb4ec46a4efdcce49aa7884550bc1f87"
+  },
+  "ecommerce-backend/swagger/users.js": {
+    "mtime": 1784874737.2440002,
+    "ast_hash": "f24f680b4cc28c74576aef1230b357cf",
+    "semantic_hash": "f24f680b4cc28c74576aef1230b357cf"
+  },
+  "ecommerce-backend/utils/imageUrl.js": {
+    "mtime": 1784874737.2440002,
+    "ast_hash": "230f7361f1f328681b1cf7805620b641",
+    "semantic_hash": "230f7361f1f328681b1cf7805620b641"
+  },
+  "ecommerce-frontend/eslint.config.js": {
+    "mtime": 1784874737.2441037,
+    "ast_hash": "3aa4b57d7f08181d86bde52a4dcb7f22",
+    "semantic_hash": "3aa4b57d7f08181d86bde52a4dcb7f22"
+  },
+  "ecommerce-frontend/package.json": {
+    "mtime": 1784874737.2441037,
+    "ast_hash": "fb2a641346d01925349bb7fa6fcde19e",
+    "semantic_hash": "fb2a641346d01925349bb7fa6fcde19e"
+  },
+  "ecommerce-frontend/src/App.jsx": {
+    "mtime": 1784874737.2445357,
+    "ast_hash": "73b6bb2d405da4aa5d1b7093b0c8c6af",
+    "semantic_hash": "73b6bb2d405da4aa5d1b7093b0c8c6af"
+  },
+  "ecommerce-frontend/src/components/Footer.jsx": {
+    "mtime": 1784874737.2445796,
+    "ast_hash": "141ca1fd9d14e53427471f9eb316eb1c",
+    "semantic_hash": "141ca1fd9d14e53427471f9eb316eb1c"
+  },
+  "ecommerce-frontend/src/components/Navbar.jsx": {
+    "mtime": 1784874737.2446656,
+    "ast_hash": "75e3dcb1e6b11e5f3d4f515aea408c94",
+    "semantic_hash": "75e3dcb1e6b11e5f3d4f515aea408c94"
+  },
+  "ecommerce-frontend/src/data/products.js": {
+    "mtime": 1784874737.2446656,
+    "ast_hash": "1d62625c3e0526928cb320ff01590c34",
+    "semantic_hash": "1d62625c3e0526928cb320ff01590c34"
+  },
+  "ecommerce-frontend/src/main.jsx": {
+    "mtime": 1784874737.2446656,
+    "ast_hash": "830211aeb54c4e0cfc62106f3420fe15",
+    "semantic_hash": "830211aeb54c4e0cfc62106f3420fe15"
+  },
+  "ecommerce-frontend/src/pages/Cart.jsx": {
+    "mtime": 1784874737.2446656,
+    "ast_hash": "2f0a69dd15a1def260616bc1e7ba6127",
+    "semantic_hash": "2f0a69dd15a1def260616bc1e7ba6127"
+  },
+  "ecommerce-frontend/src/pages/Checkout.jsx": {
+    "mtime": 1784874737.244793,
+    "ast_hash": "c517ee8e43700448daecf7715e5dbce6",
+    "semantic_hash": "c517ee8e43700448daecf7715e5dbce6"
+  },
+  "ecommerce-frontend/src/pages/Home.jsx": {
+    "mtime": 1784874737.244793,
+    "ast_hash": "85c0f3731e439bd6fde9b1b64c10cd0a",
+    "semantic_hash": "85c0f3731e439bd6fde9b1b64c10cd0a"
+  },
+  "ecommerce-frontend/src/pages/Login.jsx": {
+    "mtime": 1784874737.244793,
+    "ast_hash": "57ed180433c3d023717ae4fbc19fbdf6",
+    "semantic_hash": "57ed180433c3d023717ae4fbc19fbdf6"
+  },
+  "ecommerce-frontend/src/pages/OrderSuccess.jsx": {
+    "mtime": 1784874737.244793,
+    "ast_hash": "980e2faf55e158a14098dea477802a89",
+    "semantic_hash": "980e2faf55e158a14098dea477802a89"
+  },
+  "ecommerce-frontend/src/pages/ProductDetails.jsx": {
+    "mtime": 1784874737.244793,
+    "ast_hash": "0a1758487a3155e120582931b014c82b",
+    "semantic_hash": "0a1758487a3155e120582931b014c82b"
+  },
+  "ecommerce-frontend/src/pages/Signup.jsx": {
+    "mtime": 1784874737.244793,
+    "ast_hash": "b9a029afe6157898244427152407afcf",
+    "semantic_hash": "b9a029afe6157898244427152407afcf"
+  },
+  "ecommerce-frontend/src/services/axios.js": {
+    "mtime": 1784874737.244793,
+    "ast_hash": "7a08ecadb33e29369ddbabd4835db776",
+    "semantic_hash": "7a08ecadb33e29369ddbabd4835db776"
+  },
+  "ecommerce-frontend/src/store/authSlice.js": {
+    "mtime": 1784874737.244793,
+    "ast_hash": "f701fd0eef9d766e4824e4fcf5694333",
+    "semantic_hash": "f701fd0eef9d766e4824e4fcf5694333"
+  },
+  "ecommerce-frontend/src/store/cartSlice.js": {
+    "mtime": 1784874737.2450337,
+    "ast_hash": "4eba628bab855231f5a52fa0a0673f04",
+    "semantic_hash": "4eba628bab855231f5a52fa0a0673f04"
+  },
+  "ecommerce-frontend/src/store/store.js": {
+    "mtime": 1784874737.2450337,
+    "ast_hash": "2acd63e3fefd11af2890be16b64c74fd",
+    "semantic_hash": "2acd63e3fefd11af2890be16b64c74fd"
+  },
+  "ecommerce-frontend/vite.config.js": {
+    "mtime": 1784874737.2450995,
+    "ast_hash": "88439104b3c207f17d33ef3160e3b080",
+    "semantic_hash": "88439104b3c207f17d33ef3160e3b080"
+  },
+  "package.json": {
+    "mtime": 1784874737.2450995,
+    "ast_hash": "2d0afbd515e1677ac2102cd77c3cc1d6",
+    "semantic_hash": "2d0afbd515e1677ac2102cd77c3cc1d6"
+  },
+  ".github/steps/1-install-graphify-cli.md": {
+    "mtime": 1784874737.0876548,
+    "ast_hash": "2d384db0b6a3a612b6a51da89b22a3a6",
+    "semantic_hash": "2d384db0b6a3a612b6a51da89b22a3a6"
+  },
+  ".github/steps/2-ai-assistant-integration.md": {
+    "mtime": 1784874737.0876956,
+    "ast_hash": "122af80f13ff8e1257d52fdd840fc6d7",
+    "semantic_hash": "122af80f13ff8e1257d52fdd840fc6d7"
+  },
+  ".github/steps/3-add-graphifyignore.md": {
+    "mtime": 1784874737.0876956,
+    "ast_hash": "1b02d8ca79ee8426a5ba6dcbc68f7667",
+    "semantic_hash": "1b02d8ca79ee8426a5ba6dcbc68f7667"
+  },
+  ".github/steps/4-build-first-graph.md": {
+    "mtime": 1784874737.0876956,
+    "ast_hash": "c655a39fa649fafc5146ac71927edafd",
+    "semantic_hash": "c655a39fa649fafc5146ac71927edafd"
+  },
+  ".github/steps/5-draft-tests.md": {
+    "mtime": 1784874737.0876956,
+    "ast_hash": "dc9a200dca686b30d1af095f6028ee61",
+    "semantic_hash": "dc9a200dca686b30d1af095f6028ee61"
+  },
+  ".github/steps/6-implement-feature.md": {
+    "mtime": 1784874737.0876956,
+    "ast_hash": "6a0f9d0e8222fdcc559ea2d0b9e6aad8",
+    "semantic_hash": "6a0f9d0e8222fdcc559ea2d0b9e6aad8"
+  },
+  ".github/steps/x-review-wave2.md": {
+    "mtime": 1784874737.0876956,
+    "ast_hash": "373c3b2c0b5a17736b3035a0c320cb0a",
+    "semantic_hash": "373c3b2c0b5a17736b3035a0c320cb0a"
+  },
+  ".github/steps/x-review.md": {
+    "mtime": 1784874737.0876956,
+    "ast_hash": "c5c6b228b9db246a6b20b3e9dbb0e1a5",
+    "semantic_hash": "c5c6b228b9db246a6b20b3e9dbb0e1a5"
+  },
+  ".github/workflows/0-start-exercise.yml": {
+    "mtime": 1784874737.0876956,
+    "ast_hash": "abc779c5fb6d30eee94c579f57b47330",
+    "semantic_hash": "abc779c5fb6d30eee94c579f57b47330"
+  },
+  ".github/workflows/1-install-graphify-cli.yml": {
+    "mtime": 1784874737.087954,
+    "ast_hash": "738fa7a129936804f672446c6e383298",
+    "semantic_hash": "738fa7a129936804f672446c6e383298"
+  },
+  ".github/workflows/2-ai-assistant-integration.yml": {
+    "mtime": 1784874737.087954,
+    "ast_hash": "f4512c1f22f6e9332a6df5cc61dfa932",
+    "semantic_hash": "f4512c1f22f6e9332a6df5cc61dfa932"
+  },
+  ".github/workflows/3-add-graphifyignore.yml": {
+    "mtime": 1784874737.087954,
+    "ast_hash": "9971a464d31e28ecdf154cb8c5dbb2c0",
+    "semantic_hash": "9971a464d31e28ecdf154cb8c5dbb2c0"
+  },
+  ".github/workflows/4-build-first-graph.yml": {
+    "mtime": 1784874737.087954,
+    "ast_hash": "bea6c1452db4b4718e39f61975515b7b",
+    "semantic_hash": "bea6c1452db4b4718e39f61975515b7b"
+  },
+  ".github/workflows/5-draft-tests.yml": {
+    "mtime": 1784874737.087954,
+    "ast_hash": "ce87c8d8009a6e8f6e64e939977c05e0",
+    "semantic_hash": "ce87c8d8009a6e8f6e64e939977c05e0"
+  },
+  ".github/workflows/6-implement-feature.yml": {
+    "mtime": 1784874737.087954,
+    "ast_hash": "805c86b4d2aa1933db93d8e346f3391f",
+    "semantic_hash": "805c86b4d2aa1933db93d8e346f3391f"
+  },
+  "AGENTS.md": {
+    "mtime": 1784874737.087954,
+    "ast_hash": "4b3ee6c02c6d96798ee352523c8133fe",
+    "semantic_hash": "4b3ee6c02c6d96798ee352523c8133fe"
+  },
+  "README.md": {
+    "mtime": 1784874737.087954,
+    "ast_hash": "d284aeea398efd01575f6cf8dd2fc9ff",
+    "semantic_hash": "d284aeea398efd01575f6cf8dd2fc9ff"
+  },
+  "ecommerce-backend/README.md": {
+    "mtime": 1784874737.087954,
+    "ast_hash": "a12e0f7f2d14687d013c0cb2f01249de",
+    "semantic_hash": "a12e0f7f2d14687d013c0cb2f01249de"
+  },
+  "ecommerce-frontend/README.md": {
+    "mtime": 1784874737.2441037,
+    "ast_hash": "826f4e71c590d871a6ebc7ae0068b497",
+    "semantic_hash": "826f4e71c590d871a6ebc7ae0068b497"
+  },
+  "ecommerce-frontend/index.html": {
+    "mtime": 1784874737.2441037,
+    "ast_hash": "ee868e7630fe189fab3f322d2a61d2d4",
+    "semantic_hash": "ee868e7630fe189fab3f322d2a61d2d4"
+  },
+  "graphify-setup/CLI_OK.md": {
+    "mtime": 1784874809.639263,
+    "ast_hash": "eead3bba0ad0a83585caa178e97b8e63",
+    "semantic_hash": "eead3bba0ad0a83585caa178e97b8e63"
+  },
+  "ticket.md": {
+    "mtime": 1784874737.2450995,
+    "ast_hash": "7835b74f750a6bbf7d51148d345e81e5",
+    "semantic_hash": "7835b74f750a6bbf7d51148d345e81e5"
+  },
+  "ecommerce-backend/images/download (1).jpeg": {
+    "mtime": 1784874737.0888283,
+    "ast_hash": "3f5d35f4ad541b0bfbe34523ce4902cd",
+    "semantic_hash": "3f5d35f4ad541b0bfbe34523ce4902cd"
+  },
+  "ecommerce-backend/images/download (2).jpeg": {
+    "mtime": 1784874737.0889316,
+    "ast_hash": "f5f0e2aa077000410436d1acd0889bb0",
+    "semantic_hash": "f5f0e2aa077000410436d1acd0889bb0"
+  },
+  "ecommerce-backend/images/download (3).jpeg": {
+    "mtime": 1784874737.0889316,
+    "ast_hash": "9ed4c280d8b442534b44904df69648d4",
+    "semantic_hash": "9ed4c280d8b442534b44904df69648d4"
+  },
+  "ecommerce-backend/images/download.jpeg": {
+    "mtime": 1784874737.0889316,
+    "ast_hash": "1fa57a6e70b8ad9f17e5f44f9861cb16",
+    "semantic_hash": "1fa57a6e70b8ad9f17e5f44f9861cb16"
+  },
+  "ecommerce-backend/images/images.jpeg": {
+    "mtime": 1784874737.0889316,
+    "ast_hash": "654c8e91ebd5ace71cc9d97b7f9633e9",
+    "semantic_hash": "654c8e91ebd5ace71cc9d97b7f9633e9"
+  },
+  "ecommerce-backend/images/mohamad-khosravi-Uw3OfKz2J-0-unsplash.jpg": {
+    "mtime": 1784874737.0908415,
+    "ast_hash": "82a8894b71ec56df7f00d28bab63abb1",
+    "semantic_hash": "82a8894b71ec56df7f00d28bab63abb1"
+  },
+  "ecommerce-backend/images/pexels-achi-murusidze-2064615248-33515418.jpg": {
+    "mtime": 1784874737.0928414,
+    "ast_hash": "45e9fd1e0533fc6d9a7c91fb916133bb",
+    "semantic_hash": "45e9fd1e0533fc6d9a7c91fb916133bb"
+  },
+  "ecommerce-backend/images/pexels-af123456-9947120.jpg": {
+    "mtime": 1784874737.0988412,
+    "ast_hash": "d9ae27c914cb0868fabb8fad4338d065",
+    "semantic_hash": "d9ae27c914cb0868fabb8fad4338d065"
+  },
+  "ecommerce-backend/images/pexels-aksinfo7-36780332.jpg": {
+    "mtime": 1784874737.104841,
+    "ast_hash": "c8cb6bb3bc39313015a5b2456093a023",
+    "semantic_hash": "c8cb6bb3bc39313015a5b2456093a023"
+  },
+  "ecommerce-backend/images/pexels-aksinfo7-37259469.jpg": {
+    "mtime": 1784874737.108841,
+    "ast_hash": "a3dd2f934fb015000244c0de1da78640",
+    "semantic_hash": "a3dd2f934fb015000244c0de1da78640"
+  },
+  "ecommerce-backend/images/pexels-alipazani-32741474.jpg": {
+    "mtime": 1784874737.1108408,
+    "ast_hash": "ec7c5251944f9ac8fe18778a6605ac69",
+    "semantic_hash": "ec7c5251944f9ac8fe18778a6605ac69"
+  },
+  "ecommerce-backend/images/pexels-andre-henrique-1490223-11191225.jpg": {
+    "mtime": 1784874737.1128407,
+    "ast_hash": "0eeb126bc6a09d06da614500e2e1cce5",
+    "semantic_hash": "0eeb126bc6a09d06da614500e2e1cce5"
+  },
+  "ecommerce-backend/images/pexels-bandar-baant-2160637741-36899306.jpg": {
+    "mtime": 1784874737.1138408,
+    "ast_hash": "79c9b43069f745ac61c091ef053bb35c",
+    "semantic_hash": "79c9b43069f745ac61c091ef053bb35c"
+  },
+  "ecommerce-backend/images/pexels-bandar-baant-2160637741-36942017.jpg": {
+    "mtime": 1784874737.1168406,
+    "ast_hash": "fec1fc8c0a759e3ede181290819503c8",
+    "semantic_hash": "fec1fc8c0a759e3ede181290819503c8"
+  },
+  "ecommerce-backend/images/pexels-bandar-baant-2160637741-37075908 (1).jpg": {
+    "mtime": 1784874737.1188405,
+    "ast_hash": "98189bfdadea3d5c02170d513d63cdb0",
+    "semantic_hash": "98189bfdadea3d5c02170d513d63cdb0"
+  },
+  "ecommerce-backend/images/pexels-bandar-baant-2160637741-37075908.jpg": {
+    "mtime": 1784874737.1198406,
+    "ast_hash": "98189bfdadea3d5c02170d513d63cdb0",
+    "semantic_hash": "98189bfdadea3d5c02170d513d63cdb0"
+  },
+  "ecommerce-backend/images/pexels-behrouz-sasani-3568050-6182171.jpg": {
+    "mtime": 1784874737.1208405,
+    "ast_hash": "0ca0eabeab03712da65aad7786eac72f",
+    "semantic_hash": "0ca0eabeab03712da65aad7786eac72f"
+  },
+  "ecommerce-backend/images/pexels-bigshowlamar-19617479.jpg": {
+    "mtime": 1784874737.13284,
+    "ast_hash": "25502959962c52f42edd558fe1984967",
+    "semantic_hash": "25502959962c52f42edd558fe1984967"
+  },
+  "ecommerce-backend/images/pexels-bymuratisikofficial-19451212.jpg": {
+    "mtime": 1784874737.1378398,
+    "ast_hash": "f3fa5d109fb21c9c634d37500f12549b",
+    "semantic_hash": "f3fa5d109fb21c9c634d37500f12549b"
+  },
+  "ecommerce-backend/images/pexels-bymuratisikofficial-33787543.jpg": {
+    "mtime": 1784874737.1418397,
+    "ast_hash": "efc5c5e1e9471108dfb62730a54574ac",
+    "semantic_hash": "efc5c5e1e9471108dfb62730a54574ac"
+  },
+  "ecommerce-backend/images/pexels-cottonbro-6616673.jpg": {
+    "mtime": 1784874737.1428397,
+    "ast_hash": "ebc08c5d9a4e7911420441890ee698c6",
+    "semantic_hash": "ebc08c5d9a4e7911420441890ee698c6"
+  },
+  "ecommerce-backend/images/pexels-gabrielvieirafoto-9488893.jpg": {
+    "mtime": 1784874737.1478395,
+    "ast_hash": "da3874c3677d866da0efed479384581c",
+    "semantic_hash": "da3874c3677d866da0efed479384581c"
+  },
+  "ecommerce-backend/images/pexels-gaurav_-ranjitkar-3554799-7369454.jpg": {
+    "mtime": 1784874737.1508393,
+    "ast_hash": "524907f10f8dd2a285baab9cf64fff44",
+    "semantic_hash": "524907f10f8dd2a285baab9cf64fff44"
+  },
+  "ecommerce-backend/images/pexels-gustavo-fring-4971320 (copy).jpg": {
+    "mtime": 1784874737.1558392,
+    "ast_hash": "e25366c88e0a745478773c448dfd4ff5",
+    "semantic_hash": "e25366c88e0a745478773c448dfd4ff5"
+  },
+  "ecommerce-backend/images/pexels-gustavo-fring-4971320.jpg": {
+    "mtime": 1784874737.161839,
+    "ast_hash": "e25366c88e0a745478773c448dfd4ff5",
+    "semantic_hash": "e25366c88e0a745478773c448dfd4ff5"
+  },
+  "ecommerce-backend/images/pexels-m1ddl3-m7n-288920932-14598170.jpg": {
+    "mtime": 1784874737.1658387,
+    "ast_hash": "39a0d018eef79079211b2589475c9136",
+    "semantic_hash": "39a0d018eef79079211b2589475c9136"
+  },
+  "ecommerce-backend/images/pexels-mart-production-8217533.jpg": {
+    "mtime": 1784874737.166839,
+    "ast_hash": "1ba60b6b76f7dc9489163ec022faebe1",
+    "semantic_hash": "1ba60b6b76f7dc9489163ec022faebe1"
+  },
+  "ecommerce-backend/images/pexels-moh-adbelghaffar-12159459.jpg": {
+    "mtime": 1784874737.1738386,
+    "ast_hash": "49055095076600bd64fa87bef035b626",
+    "semantic_hash": "49055095076600bd64fa87bef035b626"
+  },
+  "ecommerce-backend/images/pexels-moh-adbelghaffar-14887834.jpg": {
+    "mtime": 1784874737.1788383,
+    "ast_hash": "b4cec63c3b8f5509326be4f0f75a2364",
+    "semantic_hash": "b4cec63c3b8f5509326be4f0f75a2364"
+  },
+  "ecommerce-backend/images/pexels-moh-adbelghaffar-30080154.jpg": {
+    "mtime": 1784874737.1838381,
+    "ast_hash": "b266e62ef308469b924ac615ca83d4fb",
+    "semantic_hash": "b266e62ef308469b924ac615ca83d4fb"
+  },
+  "ecommerce-backend/images/pexels-n3kky-5304598.jpg": {
+    "mtime": 1784874737.188838,
+    "ast_hash": "3204cb3497564f11156b1f9d2a0006e0",
+    "semantic_hash": "3204cb3497564f11156b1f9d2a0006e0"
+  },
+  "ecommerce-backend/images/pexels-parinda-shaan-2280561-28246497.jpg": {
+    "mtime": 1784874737.1978376,
+    "ast_hash": "bc008fba8a4358786f7e45bdb6be8f98",
+    "semantic_hash": "bc008fba8a4358786f7e45bdb6be8f98"
+  },
+  "ecommerce-backend/images/pexels-parinda-shaan-2280561-7957153.jpg": {
+    "mtime": 1784874737.216837,
+    "ast_hash": "e8bb1c212d3fb3e22747a2c5d2cf2913",
+    "semantic_hash": "e8bb1c212d3fb3e22747a2c5d2cf2913"
+  },
+  "ecommerce-backend/images/pexels-skgphotography-21378381.jpg": {
+    "mtime": 1784874737.2198367,
+    "ast_hash": "4f3987c93cfad79b0673fd0074b1e8a7",
+    "semantic_hash": "4f3987c93cfad79b0673fd0074b1e8a7"
+  },
+  "ecommerce-backend/images/pexels-vazhnik-7562181.jpg": {
+    "mtime": 1784874737.2218368,
+    "ast_hash": "5aa4c791fc8b788facd6be4c29d1ef88",
+    "semantic_hash": "5aa4c791fc8b788facd6be4c29d1ef88"
+  },
+  "ecommerce-backend/images/pexels-vazhnik-7562315.jpg": {
+    "mtime": 1784874737.2248366,
+    "ast_hash": "a9be1846d12810db86d123650f7d2d14",
+    "semantic_hash": "a9be1846d12810db86d123650f7d2d14"
+  },
+  "ecommerce-backend/images/pexels-vybe-focus-studioz-428109454-34254189.jpg": {
+    "mtime": 1784874737.2358363,
+    "ast_hash": "fd7e05a67aa6bcaa3e128ecdf6098cd3",
+    "semantic_hash": "fd7e05a67aa6bcaa3e128ecdf6098cd3"
+  },
+  "ecommerce-backend/images/pexels-wolfart-18339050.jpg": {
+    "mtime": 1784874737.238836,
+    "ast_hash": "b7de3e904a24a69bd7aaf2cc1bdd0fb9",
+    "semantic_hash": "b7de3e904a24a69bd7aaf2cc1bdd0fb9"
+  },
+  "ecommerce-backend/images/pexels-yakup-polat-420882786-22604242.jpg": {
+    "mtime": 1784874737.242836,
+    "ast_hash": "bbd7a9d76e4eb71be48036fc54d9d9b4",
+    "semantic_hash": "bbd7a9d76e4eb71be48036fc54d9d9b4"
+  },
+  "ecommerce-frontend/public/icons.svg": {
+    "mtime": 1784874737.2441037,
+    "ast_hash": "3b4fcfcf393eca4d264dca4a4663bc37",
+    "semantic_hash": "3b4fcfcf393eca4d264dca4a4663bc37"
+  },
+  "ecommerce-frontend/public/shopping-cart.svg": {
+    "mtime": 1784874737.2444441,
+    "ast_hash": "ff837d98734e89d67677c31abb742790",
+    "semantic_hash": "ff837d98734e89d67677c31abb742790"
+  },
+  "ecommerce-frontend/src/assets/hero.png": {
+    "mtime": 1784874737.2445357,
+    "ast_hash": "aead493361b27e7510691c5d7072dfc1",
+    "semantic_hash": "aead493361b27e7510691c5d7072dfc1"
+  },
+  "ecommerce-frontend/src/assets/react.svg": {
+    "mtime": 1784874737.2445796,
+    "ast_hash": "f0402b67b6ce880f65666bb49e841696",
+    "semantic_hash": "f0402b67b6ce880f65666bb49e841696"
+  },
+  "ecommerce-frontend/src/assets/vite.svg": {
+    "mtime": 1784874737.2445796,
+    "ast_hash": "9960a24288958394ac50e57ff638b036",
+    "semantic_hash": "9960a24288958394ac50e57ff638b036"
+  }
+}
