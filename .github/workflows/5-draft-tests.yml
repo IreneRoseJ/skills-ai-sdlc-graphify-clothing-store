@@ -1,0 +1,213 @@
+name: Step 5 # Wave 2 Draft Tests (RED)
+
+# Checks Step 5: learner committed failing tests first.
+# CI must observe RED and fail if implementation was included.
+
+on:
+  push:
+    branches:
+      - main
+    # package.json / vite.config exist in the template and would fire on initial push.
+    paths:
+      - "ecommerce-frontend/src/**/*.test.js"
+      - "ecommerce-frontend/src/**/*.test.jsx"
+      - "ecommerce-frontend/src/test-setup.js"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+  issues: write
+
+env:
+  STEP_6_FILE: ".github/steps/6-implement-feature.md"
+
+jobs:
+  find_exercise:
+    name: Find Exercise Issue
+    uses: skills/exercise-toolkit/.github/workflows/find-exercise-issue.yml@v0.7.0
+
+  check_step_work:
+    name: Check step work
+    runs-on: ubuntu-latest
+    needs: find_exercise
+    env:
+      ISSUE_REPOSITORY: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 3
+
+      - name: Get response templates
+        uses: actions/checkout@v4
+        with:
+          repository: skills/exercise-toolkit
+          path: exercise-toolkit
+          ref: v0.7.0
+
+      - name: Find last comment
+        id: find-last-comment
+        uses: peter-evans/find-comment@v3
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          direction: last
+
+      - name: Update comment - checking work
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          comment-id: ${{ steps.find-last-comment.outputs.comment-id }}
+          file: exercise-toolkit/markdown-templates/step-feedback/checking-work.md
+          edit-mode: replace
+
+      - name: Check commit boundaries for test-only commit
+        id: check-boundary
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+
+          CHANGED_FILES="$(git diff --name-only HEAD^ HEAD)"
+          echo "$CHANGED_FILES"
+
+          if ! echo "$CHANGED_FILES" | grep -qE '^ecommerce-frontend/src/.+\.test\.(js|jsx)$'; then
+            echo "No frontend test file changes found in this commit" >&2
+            exit 1
+          fi
+
+          if echo "$CHANGED_FILES" | grep -qE '^ecommerce-frontend/src/pages/Cart\.jsx$|^ecommerce-frontend/src/store/cartSlice\.js$|^ecommerce-frontend/src/pages/Checkout\.jsx$'; then
+            echo "Implementation files were changed in the RED commit. Keep tests and implementation in separate commits." >&2
+            exit 1
+          fi
+
+          echo "STEP_MESSAGE=Commit contains test changes and no implementation file changes" >> "$GITHUB_OUTPUT"
+
+      - name: Install frontend dependencies
+        if: steps.check-boundary.outcome == 'success'
+        run: |
+          set -euo pipefail
+          cd ecommerce-frontend
+          npm ci
+
+      - name: Run tests and verify RED
+        id: check-red
+        if: steps.check-boundary.outcome == 'success'
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+
+          mapfile -t TEST_FILES < <(
+            git diff --name-only HEAD^ HEAD |
+              grep -E '^ecommerce-frontend/src/.+\.test\.(js|jsx)$' |
+              sed 's#^ecommerce-frontend/##'
+          )
+
+          if [ "${#TEST_FILES[@]}" -eq 0 ]; then
+            echo "No changed frontend test files found for Step 5 RED check" >&2
+            exit 1
+          fi
+
+          cd ecommerce-frontend
+
+          set +e
+          npx vitest run "${TEST_FILES[@]}" --reporter=json --outputFile=vitest-red.json
+          EXIT_CODE=$?
+          set -e
+
+          if [ ! -f vitest-red.json ]; then
+            echo "Could not read Vitest JSON report. Ensure test tooling is configured." >&2
+            exit 1
+          fi
+
+          node <<'NODE'
+          const fs = require('fs');
+          const data = JSON.parse(fs.readFileSync('vitest-red.json', 'utf8'));
+          const total = data.numTotalTests ?? 0;
+          const failed = data.numFailedTests ?? 0;
+          if (!total || failed < 1) {
+            console.error('RED check failed: expected at least one failing test in step 5.');
+            process.exit(1);
+          }
+          NODE
+
+          if [ "$EXIT_CODE" -eq 0 ]; then
+            echo "Step 5 requires RED, but tests exited successfully." >&2
+            exit 1
+          fi
+
+          echo "STEP_MESSAGE=RED confirmed: tests failed as expected in test-only commit" >> "$GITHUB_OUTPUT"
+
+      - name: Update comment - step results
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          comment-id: ${{ steps.find-last-comment.outputs.comment-id }}
+          file: exercise-toolkit/markdown-templates/step-feedback/step-results-table.md
+          edit-mode: replace
+          vars: |
+            step_number: 5
+            results_table:
+              - description: "Commit contains test changes and no implementation file changes"
+                passed: ${{ steps.check-boundary.outcome == 'success' }}
+              - description: "RED confirmed: tests failed as expected in test-only commit"
+                passed: ${{ steps.check-red.outcome == 'success' }}
+
+      - name: Fail job if checks failed
+        if: |
+          steps.check-boundary.outcome == 'failure' ||
+          steps.check-red.outcome == 'failure'
+        run: exit 1
+
+  post_next_step_content:
+    name: Post next step content
+    needs: [find_exercise, check_step_work]
+    runs-on: ubuntu-latest
+    env:
+      ISSUE_REPOSITORY: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get response templates
+        uses: actions/checkout@v4
+        with:
+          repository: skills/exercise-toolkit
+          path: exercise-toolkit
+          ref: v0.7.0
+
+      - name: Create comment - step finished
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: exercise-toolkit/markdown-templates/step-feedback/step-finished-prepare-next-step.md
+          vars: |
+            next_step_number: 6
+
+      - name: Create comment - add step content
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: ${{ env.STEP_6_FILE }}
+
+      - name: Create comment - watching for progress
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: exercise-toolkit/markdown-templates/step-feedback/watching-for-progress.md
+
+      - name: Disable current workflow and enable next one
+        run: |
+          gh workflow disable "5-draft-tests.yml" || true
+          gh workflow enable "6-implement-feature.yml"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

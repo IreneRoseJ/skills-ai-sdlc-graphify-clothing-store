@@ -1,0 +1,133 @@
+name: Step 9 # Context engineering
+
+# Checks assistant context-engineering instructions
+
+on:
+  push:
+    branches: [main]
+    # AGENTS.md already exists — including it would run on the initial push.
+    # For AGENTS.md-only edits, push then Run workflow (workflow_dispatch).
+    paths:
+      - ".cursor/rules/token-efficiency.mdc"
+      - "CLAUDE.md"
+      - ".github/copilot-instructions.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+  issues: write
+
+env:
+  STEP_10_FILE: ".github/steps/token-optimization/10-reading-guide.md"
+
+jobs:
+  find_exercise:
+    name: Find Exercise Issue
+    uses: skills/exercise-toolkit/.github/workflows/find-exercise-issue.yml@v0.7.0
+
+  check_step_work:
+    name: Check step work
+    runs-on: ubuntu-latest
+    needs: find_exercise
+    env:
+      ISSUE_REPOSITORY: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: skills/exercise-toolkit
+          path: exercise-toolkit
+          ref: v0.7.0
+      - name: Find last comment
+        id: find-last-comment
+        uses: peter-evans/find-comment@v3
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          direction: last
+      - name: Update comment - checking work
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          comment-id: ${{ steps.find-last-comment.outputs.comment-id }}
+          file: exercise-toolkit/markdown-templates/step-feedback/checking-work.md
+          edit-mode: replace
+      - name: Check step work
+        id: check
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          found=""
+          check_file() {
+            local f="$1"; local label="$2"
+            test -f "$f" && test -s "$f" || return 1
+            grep -qiE 'diff|changed lines' "$f" || return 1
+            grep -qiE 'node_modules|paste' "$f" || return 1
+            grep -qiE '40-50%|40–50%|fresh session' "$f" || return 1
+            found="$label"; return 0
+          }
+          if check_file .cursor/rules/token-efficiency.mdc "Cursor rule"; then true
+          elif check_file CLAUDE.md "CLAUDE.md"; then true
+          elif check_file .github/copilot-instructions.md "copilot-instructions"; then true
+          elif check_file AGENTS.md "AGENTS.md"; then true
+          else echo "No context-engineering instructions found"; exit 1; fi
+          echo "STEP_MESSAGE=${found}" >> "$GITHUB_OUTPUT"
+      - name: Update comment - step results
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          comment-id: ${{ steps.find-last-comment.outputs.comment-id }}
+          file: exercise-toolkit/markdown-templates/step-feedback/step-results-table.md
+          edit-mode: replace
+          vars: |
+            step_number: 9
+            results_table:
+              - description: ${{ steps.check.outputs.STEP_MESSAGE || 'Context engineering instructions valid' }}
+                passed: ${{ steps.check.outcome == 'success' }}
+      - name: Fail job if checks failed
+        if: steps.check.outcome == 'failure'
+        run: exit 1
+
+  post_next_step_content:
+    name: Post next step content
+    needs: [find_exercise, check_step_work]
+    runs-on: ubuntu-latest
+    env:
+      ISSUE_REPOSITORY: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: skills/exercise-toolkit
+          path: exercise-toolkit
+          ref: v0.7.0
+      - uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: exercise-toolkit/markdown-templates/step-feedback/step-finished-prepare-next-step.md
+          vars: |
+            next_step_number: 10
+      - uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: ${{ env.STEP_10_FILE }}
+      - uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: exercise-toolkit/markdown-templates/step-feedback/watching-for-progress.md
+      - name: Disable current workflow and enable next one
+        run: |
+          gh workflow disable "9-token-opt-context-engineering.yml" || true
+          gh workflow enable "10-token-opt-reading-guide.yml"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

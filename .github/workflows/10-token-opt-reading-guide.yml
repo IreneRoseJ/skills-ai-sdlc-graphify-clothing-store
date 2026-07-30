@@ -1,0 +1,137 @@
+name: Step 10 # Reading guide
+
+# Checks docs/TOKEN_OPTIMIZATION.md (models + prompts + monitoring) and finishes
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/TOKEN_OPTIMIZATION.md"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+  issues: write
+
+env:
+  REVIEW_FILE: ".github/steps/token-optimization/x-review.md"
+
+jobs:
+  find_exercise:
+    name: Find Exercise Issue
+    uses: skills/exercise-toolkit/.github/workflows/find-exercise-issue.yml@v0.7.0
+
+  check_step_work:
+    name: Check step work
+    runs-on: ubuntu-latest
+    needs: find_exercise
+    env:
+      ISSUE_REPOSITORY: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: skills/exercise-toolkit
+          path: exercise-toolkit
+          ref: v0.7.0
+      - name: Find last comment
+        id: find-last-comment
+        uses: peter-evans/find-comment@v3
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          direction: last
+      - name: Update comment - checking work
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          comment-id: ${{ steps.find-last-comment.outputs.comment-id }}
+          file: exercise-toolkit/markdown-templates/step-feedback/checking-work.md
+          edit-mode: replace
+      - name: Check step work
+        id: check
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          test -f docs/TOKEN_OPTIMIZATION.md
+          test -s docs/TOKEN_OPTIMIZATION.md
+          grep -qiE 'cheap|haiku|flash|default' docs/TOKEN_OPTIMIZATION.md
+          grep -qiE 'escalat|opus|frontier' docs/TOKEN_OPTIMIZATION.md
+          grep -qi 'stable' docs/TOKEN_OPTIMIZATION.md
+          grep -qi 'volatile' docs/TOKEN_OPTIMIZATION.md
+          grep -qi 'Show only the changed' docs/TOKEN_OPTIMIZATION.md
+          grep -qi 'paymentController' docs/TOKEN_OPTIMIZATION.md
+          grep -qiE 'checklist|Weekly' docs/TOKEN_OPTIMIZATION.md
+          echo "STEP_MESSAGE=docs/TOKEN_OPTIMIZATION.md covers models, prompts, and monitoring" >> "$GITHUB_OUTPUT"
+      - name: Update comment - step results
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          comment-id: ${{ steps.find-last-comment.outputs.comment-id }}
+          file: exercise-toolkit/markdown-templates/step-feedback/step-results-table.md
+          edit-mode: replace
+          vars: |
+            step_number: 10
+            results_table:
+              - description: ${{ steps.check.outputs.STEP_MESSAGE || 'Reading guide valid' }}
+                passed: ${{ steps.check.outcome == 'success' }}
+      - name: Fail job if checks failed
+        if: steps.check.outcome == 'failure'
+        run: exit 1
+
+  post_review_content:
+    name: Post review content
+    needs: [find_exercise, check_step_work]
+    runs-on: ubuntu-latest
+    if: |
+      !github.event.repository.is_template
+    env:
+      ISSUE_REPOSITORY: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: skills/exercise-toolkit
+          path: exercise-toolkit
+          ref: v0.7.0
+      - uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: exercise-toolkit/markdown-templates/step-feedback/lesson-review.md
+      - uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: ${{ env.REVIEW_FILE }}
+      - name: Disable current workflow
+        run: gh workflow disable "10-token-opt-reading-guide.yml" || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  finish_exercise:
+    name: Finish Exercise
+    needs: [find_exercise, post_review_content]
+    uses: skills/exercise-toolkit/.github/workflows/finish-exercise.yml@v0.7.0
+    with:
+      issue-url: ${{ needs.find_exercise.outputs.issue-url }}
+      exercise-title: "AI SDLC Skills"
+
+  record_completion:
+    name: Record Course Completion
+    needs: [finish_exercise]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Record Course Completion
+        run: |
+          curl -s -o /dev/null \
+            -d "entry.1374678905=${{ github.actor }}" \
+            -d "entry.1725258721=${{ github.repository }}" \
+            "https://docs.google.com/forms/d/e/1FAIpQLSdh5ciw472YkDeauoVqvUVA8RThKR_YrQo3OATNzOQkXAcbwg/formResponse"

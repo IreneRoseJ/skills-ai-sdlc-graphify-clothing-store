@@ -1,0 +1,139 @@
+name: Step 8 # Exclude noise
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".cursorignore"
+      - ".claudeignore"
+      - ".copilotignore"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+  issues: write
+
+env:
+  STEP_9_FILE: ".github/steps/token-optimization/9-context-engineering.md"
+
+jobs:
+  find_exercise:
+    name: Find Exercise Issue
+    uses: skills/exercise-toolkit/.github/workflows/find-exercise-issue.yml@v0.7.0
+
+  check_step_work:
+    name: Check step work
+    runs-on: ubuntu-latest
+    needs: find_exercise
+    env:
+      ISSUE_REPOSITORY: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: skills/exercise-toolkit
+          path: exercise-toolkit
+          ref: v0.7.0
+
+      - name: Find last comment
+        id: find-last-comment
+        uses: peter-evans/find-comment@v3
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          direction: last
+
+      - name: Update comment - checking work
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          comment-id: ${{ steps.find-last-comment.outputs.comment-id }}
+          file: exercise-toolkit/markdown-templates/step-feedback/checking-work.md
+          edit-mode: replace
+
+      - name: Check ignore files
+        id: check-ignores
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          IGNORE_FILE=""
+          for f in .cursorignore .claudeignore .copilotignore; do
+            if [ -f "$f" ]; then
+              IGNORE_FILE="$f"
+              break
+            fi
+          done
+          if [ -z "$IGNORE_FILE" ]; then
+            echo "STEP_MESSAGE=Add .cursorignore, .claudeignore, or .copilotignore" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+          grep -q 'node_modules' "$IGNORE_FILE"
+          grep -q 'dist' "$IGNORE_FILE"
+          echo "STEP_MESSAGE=${IGNORE_FILE} excludes node_modules and dist" >> "$GITHUB_OUTPUT"
+
+      - name: Update comment - step results
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          comment-id: ${{ steps.find-last-comment.outputs.comment-id }}
+          file: exercise-toolkit/markdown-templates/step-feedback/step-results-table.md
+          edit-mode: replace
+          vars: |
+            step_number: 8
+            results_table:
+              - description: ${{ steps.check-ignores.outputs.STEP_MESSAGE || 'Ignore files are valid' }}
+                passed: ${{ steps.check-ignores.outcome == 'success' }}
+
+      - name: Fail job if checks failed
+        if: steps.check-ignores.outcome == 'failure'
+        run: exit 1
+
+  post_next_step_content:
+    name: Post next step content
+    needs: [find_exercise, check_step_work]
+    runs-on: ubuntu-latest
+    env:
+      ISSUE_REPOSITORY: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: skills/exercise-toolkit
+          path: exercise-toolkit
+          ref: v0.7.0
+
+      - uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: exercise-toolkit/markdown-templates/step-feedback/step-finished-prepare-next-step.md
+          vars: |
+            next_step_number: 9
+
+      - uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: ${{ env.STEP_9_FILE }}
+
+      - uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: exercise-toolkit/markdown-templates/step-feedback/watching-for-progress.md
+
+      - name: Disable current workflow and enable next one
+        run: |
+          gh workflow disable "8-token-opt-exclude-noise.yml" || true
+          gh workflow enable "9-token-opt-context-engineering.yml"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

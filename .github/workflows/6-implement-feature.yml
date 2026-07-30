@@ -1,0 +1,249 @@
+name: Step 6 # Wave 2 Implement Feature (GREEN)
+
+# Checks Step 6: learner committed implementation only.
+# CI must verify tests are unchanged from the previous commit and full suite is GREEN.
+
+on:
+  push:
+    branches:
+      - main
+    # Cart.jsx etc. already exist — initial push would match without the gate below.
+    paths:
+      - "ecommerce-frontend/src/pages/Cart.jsx"
+      - "ecommerce-frontend/src/store/cartSlice.js"
+      - "ecommerce-frontend/src/pages/Checkout.jsx"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+  issues: write
+
+env:
+  REVIEW_FILE: ".github/steps/x-review-wave2.md"
+  STEP_8_FILE: ".github/steps/token-optimization/8-exclude-noise.md"
+
+jobs:
+  # Skip until Step 5 has added any frontend tests (also skips the initial template push).
+  gate:
+    name: Gate previous step
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event.before != '0000000000000000000000000000000000000000'
+    outputs:
+      ready: ${{ steps.check.outputs.ready }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          elif find ecommerce-frontend/src \( -name '*.test.js' -o -name '*.test.jsx' \) -print -quit | grep -q .; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping Step 6: complete Step 5 first"
+          fi
+
+  find_exercise:
+    name: Find Exercise Issue
+    needs: gate
+    if: needs.gate.outputs.ready == 'true'
+    uses: skills/exercise-toolkit/.github/workflows/find-exercise-issue.yml@v0.7.0
+
+  check_step_work:
+    name: Check step work
+    runs-on: ubuntu-latest
+    needs: find_exercise
+    env:
+      ISSUE_REPOSITORY: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 4
+
+      - name: Get response templates
+        uses: actions/checkout@v4
+        with:
+          repository: skills/exercise-toolkit
+          path: exercise-toolkit
+          ref: v0.7.0
+
+      - name: Find last comment
+        id: find-last-comment
+        uses: peter-evans/find-comment@v3
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          direction: last
+
+      - name: Update comment - checking work
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          comment-id: ${{ steps.find-last-comment.outputs.comment-id }}
+          file: exercise-toolkit/markdown-templates/step-feedback/checking-work.md
+          edit-mode: replace
+
+      - name: Check commit boundaries for implementation commit
+        id: check-boundary
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+
+          CHANGED_FILES="$(git diff --name-only HEAD^ HEAD)"
+          echo "$CHANGED_FILES"
+
+          if ! echo "$CHANGED_FILES" | grep -qE '^ecommerce-frontend/src/pages/Cart\.jsx$|^ecommerce-frontend/src/store/cartSlice\.js$|^ecommerce-frontend/src/pages/Checkout\.jsx$'; then
+            echo "No expected implementation file changes found in this commit" >&2
+            exit 1
+          fi
+
+          if echo "$CHANGED_FILES" | grep -qE '^ecommerce-frontend/src/.+\.test\.(js|jsx)$'; then
+            echo "Test files were modified in Step 6. Keep tests frozen in implementation commit." >&2
+            exit 1
+          fi
+
+          echo "STEP_MESSAGE=Commit boundaries validated (implementation only, no test edits)" >> "$GITHUB_OUTPUT"
+
+      - name: Verify frozen test files unchanged from previous commit
+        id: check-frozen-tests
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+
+          PREV_TESTS="$(git diff --name-only HEAD^^ HEAD^ | grep -E '^ecommerce-frontend/src/.+\.test\.(js|jsx)$' || true)"
+
+          if [ -z "$PREV_TESTS" ]; then
+            echo "Could not find frozen test files from previous commit. Ensure Step 5 was completed first." >&2
+            exit 1
+          fi
+
+          while IFS= read -r file; do
+            [ -n "$file" ] || continue
+
+            if ! git cat-file -e "HEAD^:$file" 2>/dev/null; then
+              echo "Frozen test file missing in HEAD^: $file" >&2
+              exit 1
+            fi
+
+            if ! git cat-file -e "HEAD:$file" 2>/dev/null; then
+              echo "Frozen test file missing in HEAD: $file" >&2
+              exit 1
+            fi
+
+            SHA_PREV="$(git rev-parse "HEAD^:$file")"
+            SHA_CURR="$(git rev-parse "HEAD:$file")"
+
+            if [ "$SHA_PREV" != "$SHA_CURR" ]; then
+              echo "Frozen test file changed between commits: $file" >&2
+              exit 1
+            fi
+          done <<< "$PREV_TESTS"
+
+          echo "STEP_MESSAGE=Frozen tests unchanged between Step 5 and Step 6 commits" >> "$GITHUB_OUTPUT"
+
+      - name: Install frontend dependencies
+        if: steps.check-boundary.outcome == 'success' && steps.check-frozen-tests.outcome == 'success'
+        run: |
+          set -euo pipefail
+          cd ecommerce-frontend
+          npm ci
+
+      - name: Run full frontend test suite and verify GREEN
+        id: check-green
+        if: steps.check-boundary.outcome == 'success' && steps.check-frozen-tests.outcome == 'success'
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          cd ecommerce-frontend
+          npx vitest run
+          echo "STEP_MESSAGE=GREEN confirmed - full frontend test suite passed" >> "$GITHUB_OUTPUT"
+
+      - name: Update comment - step results
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          comment-id: ${{ steps.find-last-comment.outputs.comment-id }}
+          file: exercise-toolkit/markdown-templates/step-feedback/step-results-table.md
+          edit-mode: replace
+          vars: |
+            step_number: 6
+            results_table:
+              - description: "${{ steps.check-boundary.outputs.STEP_MESSAGE || 'Commit boundaries validated for implementation commit' }}"
+                passed: ${{ steps.check-boundary.outcome == 'success' }}
+              - description: "${{ steps.check-frozen-tests.outputs.STEP_MESSAGE || 'Frozen tests unchanged' }}"
+                passed: ${{ steps.check-frozen-tests.outcome == 'success' }}
+              - description: "${{ steps.check-green.outputs.STEP_MESSAGE || 'Full frontend suite is GREEN' }}"
+                passed: ${{ steps.check-green.outcome == 'success' }}
+
+      - name: Fail job if checks failed
+        if: |
+          steps.check-boundary.outcome == 'failure' ||
+          steps.check-frozen-tests.outcome == 'failure' ||
+          steps.check-green.outcome == 'failure'
+        run: exit 1
+
+  post_next_step_content:
+    name: Post next step content
+    needs: [find_exercise, check_step_work]
+    runs-on: ubuntu-latest
+    if: |
+      !github.event.repository.is_template
+    env:
+      ISSUE_REPOSITORY: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get response templates
+        uses: actions/checkout@v4
+        with:
+          repository: skills/exercise-toolkit
+          path: exercise-toolkit
+          ref: v0.7.0
+
+      - name: Create comment - add wave 2 review
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: ${{ env.REVIEW_FILE }}
+
+      - name: Create comment - step finished
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: exercise-toolkit/markdown-templates/step-feedback/step-finished-prepare-next-step.md
+          vars: |
+            next_step_number: 8
+
+      - name: Create comment - add step content
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: ${{ env.STEP_8_FILE }}
+
+      - name: Create comment - watching for progress
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: exercise-toolkit/markdown-templates/step-feedback/watching-for-progress.md
+
+      - name: Disable current workflow and enable Step 8
+        run: |
+          gh workflow disable "6-implement-feature.yml" || true
+          gh workflow disable "7-token-opt-start.yml" || true
+          gh workflow enable "8-token-opt-exclude-noise.yml"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,68 @@
+name: Step 7 # Start Token Optimization
+
+# Continues on the existing exercise issue (same issue as Steps 1–6).
+# Prefer the automatic handoff from Step 6; this is a manual recovery path.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+  issues: write
+
+env:
+  STEP_8_FILE: ".github/steps/token-optimization/8-exclude-noise.md"
+
+jobs:
+  find_exercise:
+    if: |
+      !github.event.repository.is_template
+    name: Find Exercise Issue
+    uses: skills/exercise-toolkit/.github/workflows/find-exercise-issue.yml@v0.7.0
+
+  post_next_step_content:
+    name: Post next step content
+    runs-on: ubuntu-latest
+    needs: [find_exercise]
+    env:
+      ISSUE_REPOSITORY: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get response templates
+        uses: actions/checkout@v4
+        with:
+          repository: skills/exercise-toolkit
+          path: exercise-toolkit
+          ref: v0.7.0
+
+      - name: Create comment - add step content
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: ${{ env.STEP_8_FILE }}
+
+      - name: Create comment - watching for progress
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: exercise-toolkit/markdown-templates/step-feedback/watching-for-progress.md
+
+      - name: Disable later steps; enable Step 8 only
+        run: |
+          for wf in \
+            7-token-opt-start.yml \
+            8-token-opt-exclude-noise.yml \
+            9-token-opt-context-engineering.yml \
+            10-token-opt-reading-guide.yml
+          do
+            gh workflow disable "$wf" || true
+          done
+          gh workflow enable "8-token-opt-exclude-noise.yml"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
