@@ -1,3 +1,20 @@
+---
+alwaysApply: true
+---
+
+# Token efficiency and context
+
+## Do
+- Prefer diffs / changed lines only
+- Reference symbols by name instead of pasting whole files
+- Front-load hard constraints; put the changing task last
+- Start a fresh session per task; compact around 40-50% context use
+
+## Don't
+- Paste entire files for context
+- Index or discuss node_modules, lockfiles, or dist/
+- Let one chat sprawl across unrelated tasks
+
 ## graphify
 
 For any question about this repo's architecture, structure, components, or how to add/modify/find
