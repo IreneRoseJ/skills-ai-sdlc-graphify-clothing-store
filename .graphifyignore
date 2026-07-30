@@ -1,0 +1,13 @@
+.git/
+node_modules/
+dist/
+out/
+build/
+coverage/
+.env
+.env.*
+*.log
+*.zip
+package-lock.json
+ecommerce-frontend/dist/
+ecommerce-backend/images/
