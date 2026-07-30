@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Lock, Plus, Trash2 } from 'lucide-react' 
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
@@ -17,8 +17,13 @@ const normalizeAddress = (address) => ({
 
 const Checkout = () => {
     const navigate = useNavigate()
-    const { items, totalAmount } = useSelector(state => state.cart)
+    const location = useLocation()
+    const { items } = useSelector(state => state.cart)
     const { isAuthenticated } = useSelector(state => state.auth)
+    const selectedItemsFromState = Array.isArray(location.state?.selectedItems)
+        ? location.state.selectedItems
+        : null
+    const checkoutItems = selectedItemsFromState ?? items
 
     const initialFormState = {
         firstName: '',
@@ -88,7 +93,7 @@ const Checkout = () => {
 
     const selectedShippingFee = shippingFees[formData.shippingMethod]
     const taxRate = 0.075
-    const subtotal = totalAmount
+    const subtotal = checkoutItems.reduce((sum, item) => sum + item.price * item.qty, 0)
     const tax = subtotal * taxRate
     const total = subtotal + selectedShippingFee + tax
 
@@ -159,7 +164,7 @@ const Checkout = () => {
             }
 
             const response = await api.post('/payments/create-checkout-session', {
-                items,
+                items: checkoutItems,
                 shippingDetails: formData,
                 orderSummary: {
                     subtotal,
@@ -184,7 +189,7 @@ const Checkout = () => {
         }
     }
 
-    if (items.length === 0) {
+    if (checkoutItems.length === 0) {
         return (
             <div className="checkout-page">
                 <Navbar />
@@ -435,7 +440,7 @@ const Checkout = () => {
                         </div>
 
                         <div className="products-list">
-                            {items.map((item, index) => (
+                            {checkoutItems.map((item, index) => (
                                 <div key={`${item.product}-${item.size}`} className="summary-product">
                                     <div className="product-info">
                                         <span className="product-number">{index + 1}.</span>
@@ -457,7 +462,7 @@ const Checkout = () => {
 
                         <div className="summary-totals">
                             <div className="total-items">
-                                Total Items: {items.reduce((acc, item) => acc + item.qty, 0)}
+                                Total Items: {checkoutItems.reduce((acc, item) => acc + item.qty, 0)}
                             </div>
 
                             <div className="total-row">

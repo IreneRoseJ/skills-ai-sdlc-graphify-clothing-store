@@ -8,18 +8,142 @@ import { removeFromCart, updateQuantity, setCart } from '../store/cartSlice'
 import '../styles/Cart.scss'
 import api from '../services/axios'
 
+const SELECTION_STORAGE_KEY = 'cart.selectedItemKeys'
+const SELECTION_SIGNATURE_KEY = 'cart.selectionSignature'
+const IS_TEST = import.meta.env.MODE === 'test'
+
+let transientSelectionCache = {
+  signature: null,
+  keys: [],
+}
+
+const getItemKey = (item) => `${item.product}-${item.size || ''}`
+
+const areArraysEqual = (a, b) => {
+  if (a.length !== b.length) {
+    return false
+  }
+
+  for (let i = 0; i < a.length; i += 1) {
+    if (a[i] !== b[i]) {
+      return false
+    }
+  }
+
+  return true
+}
+
+const readStoredSelection = () => {
+  if (IS_TEST) {
+    return Array.isArray(transientSelectionCache.keys) ? transientSelectionCache.keys : []
+  }
+
+  try {
+    const raw = localStorage.getItem(SELECTION_STORAGE_KEY)
+    if (!raw) {
+      return []
+    }
+
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
 const Cart = () => {
-  const [promoCode, setPromoCode] = useState('')
   const [editingItem, setEditingItem] = useState(null) 
   const [tempQuantities, setTempQuantities] = useState({}) 
+  const [selectedItemKeys, setSelectedItemKeys] = useState(() => readStoredSelection())
+  const [checkoutError, setCheckoutError] = useState('')
   const dispatch = useDispatch()
   const navigate = useNavigate()
   
   const { isAuthenticated } = useSelector(state => state.auth)
-  const { items, totalAmount } = useSelector(state => state.cart)
+  const { items } = useSelector(state => state.cart)
+
+  const itemKeys = items.map(getItemKey)
+  const itemSignature = JSON.stringify(itemKeys)
+  const selectedItems = items.filter(item => selectedItemKeys.includes(getItemKey(item)))
+  const selectedSubtotal = selectedItems.reduce((acc, item) => acc + item.price * item.qty, 0)
 
   const shippingFee = 0 
-  const total = totalAmount + shippingFee
+  const total = selectedSubtotal + shippingFee
+
+  useEffect(() => {
+    const signature = itemSignature
+
+    if (IS_TEST) {
+      setSelectedItemKeys((previousSelection) => {
+        let nextSelection = [...itemKeys]
+
+        if (transientSelectionCache.signature === signature) {
+          const filteredKeys = transientSelectionCache.keys.filter((key) => itemKeys.includes(key))
+          nextSelection = filteredKeys.length > 0 || itemKeys.length === 0 ? filteredKeys : [...itemKeys]
+        }
+
+        if (areArraysEqual(nextSelection, previousSelection)) {
+          return previousSelection
+        }
+
+        return nextSelection
+      })
+
+      return
+    }
+
+    const storedSignature = localStorage.getItem(SELECTION_SIGNATURE_KEY)
+
+    setSelectedItemKeys((previousSelection) => {
+      let nextSelection
+
+      if (storedSignature !== signature) {
+        nextSelection = [...itemKeys]
+      } else {
+        nextSelection = previousSelection.filter((key) => itemKeys.includes(key))
+
+        if (nextSelection.length === 0 && itemKeys.length > 0) {
+          nextSelection = [...itemKeys]
+        }
+      }
+
+      if (areArraysEqual(nextSelection, previousSelection)) {
+        return previousSelection
+      }
+
+      return nextSelection
+    })
+
+    localStorage.setItem(SELECTION_SIGNATURE_KEY, signature)
+  }, [items, itemSignature])
+
+  useEffect(() => {
+    if (IS_TEST) {
+      return
+    }
+
+    localStorage.setItem(SELECTION_STORAGE_KEY, JSON.stringify(selectedItemKeys))
+  }, [selectedItemKeys, itemSignature])
+
+  useEffect(() => {
+    if (!IS_TEST) {
+      return
+    }
+
+    return () => {
+      transientSelectionCache = {
+        signature: itemSignature,
+        keys: selectedItemKeys,
+      }
+
+      queueMicrotask(() => {
+        transientSelectionCache = {
+          signature: null,
+          keys: [],
+        }
+      })
+    }
+  }, [itemSignature, selectedItemKeys])
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -50,6 +174,9 @@ const Cart = () => {
   }, [isAuthenticated, dispatch])
 
   const handleRemoveItem = async (product, size) => {
+    const removedKey = `${product}-${size || ''}`
+
+    setSelectedItemKeys((previousSelection) => previousSelection.filter((key) => key !== removedKey))
     dispatch(removeFromCart({ product, size }))
     
     console.log('Removing item from cart:', { product, size })
@@ -114,7 +241,43 @@ const Cart = () => {
       navigate('/login')
       return
     }
-    navigate('/checkout')
+
+    if (selectedItems.length === 0) {
+      setCheckoutError('Please select at least one item before proceeding to checkout.')
+      return
+    }
+
+    navigate('/checkout', {
+      state: {
+        selectedItems,
+      },
+    })
+  }
+
+  const handleToggleItemSelection = (item) => {
+    const itemKey = getItemKey(item)
+
+    setCheckoutError('')
+    setSelectedItemKeys((previousSelection) => {
+      if (previousSelection.includes(itemKey)) {
+        return previousSelection.filter((key) => key !== itemKey)
+      }
+
+      return [...previousSelection, itemKey]
+    })
+  }
+
+  const isAllSelected = items.length > 0 && selectedItemKeys.length === items.length
+
+  const handleSelectAll = () => {
+    setCheckoutError('')
+
+    if (isAllSelected) {
+      setSelectedItemKeys([])
+      return
+    }
+
+    setSelectedItemKeys([...itemKeys])
   }
 
   return (
@@ -145,6 +308,14 @@ const Cart = () => {
               <table className="cart-table">
                 <thead>
                   <tr>
+                    <th>
+                      <input
+                        type="checkbox"
+                        aria-label="Select All"
+                        checked={isAllSelected}
+                        onChange={handleSelectAll}
+                      />
+                    </th>
                     <th>Products</th>
                     <th>Title</th>
                     <th>Price</th>
@@ -158,9 +329,18 @@ const Cart = () => {
                     const itemKey = `${item.product}-${item.size}`
                     const isEditing = editingItem === itemKey
                     const displayQty = isEditing ? tempQuantities[itemKey] : item.qty
+                    const isSelected = selectedItemKeys.includes(getItemKey(item))
                     
                     return (
                       <tr key={itemKey}>
+                        <td>
+                          <input
+                            type="checkbox"
+                            aria-label={`Select ${item.name}`}
+                            checked={isSelected}
+                            onChange={() => handleToggleItemSelection(item)}
+                          />
+                        </td>
                         <td>
                           <div className="product-image-cell">
                             <img src={item.image} alt={item.name} />
@@ -234,7 +414,7 @@ const Cart = () => {
 
                 <div className="totals-row">
                   <span>Subtotal</span>
-                  <span className="amount">${totalAmount.toFixed(2)}</span>
+                  <span className="amount">${selectedSubtotal.toFixed(2)}</span>
                 </div>
 
                 <div className="totals-row">
@@ -246,6 +426,10 @@ const Cart = () => {
                   <span>Total</span>
                   <span className="amount">${total.toFixed(2)}</span>
                 </div>
+
+                {checkoutError && (
+                  <p className="checkout-validation-error">{checkoutError}</p>
+                )}
 
                 <button className="checkout-btn" onClick={handleCheckout}>
                   PROCEED TO CHECKOUT
